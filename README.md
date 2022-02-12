@@ -1,6 +1,6 @@
-#Rozwiązywanie problemów poprzez przeszukiwanie przestrzeni stanów
+# Rozwiązywanie problemów poprzez przeszukiwanie przestrzeni stanów
 
-##Definicja problemu
+## Definicja problemu
 
 Zdefiniowany jest zbiór n miast, każde miasto posiada współrzędne x i y, określające jego położenie na płaszczyźnie. Zakładamy, że każde dwa miasta są połączone drogą, której przebycie wiąże się z poniesieniem kosztu, oraz że koszt podróży po danej trasie w obie strony jest taka sama. Za koszt pokonania drogi uznajemy odległość pomiędzy miastami na płaszczyźnie. Tak zdefiniowany problem możemy przedstawić w postaci pełnego grafu ważonego, którego węzłami są miasta, a krawędziami drogi pomiędzy miastami.
 
