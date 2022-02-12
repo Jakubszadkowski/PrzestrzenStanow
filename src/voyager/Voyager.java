@@ -11,70 +11,77 @@ public class Voyager {
     private double estimatedDistance;
     private boolean aStar;
 
-    public Voyager(City start, List<City> citiesToVisit, boolean aStar){
-        this.start = start;
-        this.citiesToVisit = new ArrayList<>();
+    public Voyager(List<City> locationsToVisit , City startingPoint, boolean isAStar) {
+        this.start = startingPoint;
         this.citiesVisited = new ArrayList<>();
+        this.citiesToVisit = new ArrayList<>();
         this.distance = 0;
-        this.estimatedDistance = 0;
-        this.citiesToVisit = citiesToVisit;
-        this.citiesVisited.add(start);
-        this.citiesToVisit.remove(start);
-        this.aStar = aStar;
-        if(aStar)
-        {
-            City shortest = new City(100,100);
-            for (City city : this.citiesToVisit){
-                if (start.distance(city) < start.distance(shortest)){
-                    shortest = city;
-                }
+        this.citiesToVisit = locationsToVisit;
+        this.citiesVisited.add(startingPoint);
+        this.citiesToVisit.remove(startingPoint);
+        this.aStar = true;
+        City shortest = new City(9999,9999);
+        for (City p : this.citiesToVisit){
+            if (startingPoint.distance(p) < startingPoint.distance(shortest)){
+                shortest = p;
             }
-            if (citiesToVisit.size()>1){
-                this.estimatedDistance = this.distance + start.distance(shortest) + start.distance(start);
-            }
-            else {
-                this.estimatedDistance = this.distance + start.distance(shortest);
-            }
+        }
+        if (locationsToVisit.size()>1){
+            this.estimatedDistance = this.distance + startingPoint.distance(shortest) + startingPoint.distance(start);
+        }
+        else {
+            this.estimatedDistance = this.distance + startingPoint.distance(shortest);
+        }
     }
-}
 
-
-    public Voyager(Voyager previous, City nextCity, boolean aStar){
-        this.start = previous.getStart();
-        this.citiesToVisit = new ArrayList<>(previous.getCitiesVisited());
-        this.citiesVisited = new ArrayList<>(previous.citiesVisited);
-        this.citiesToVisit.remove(nextCity);
-        this.citiesVisited.add(nextCity);
-        this.distance = previous.getDistance() + this.citiesVisited.get(citiesVisited.size()-1).distance(nextCity);
+    public Voyager(Voyager previousWay, City nextNode, boolean isAStar){
+        this.start = previousWay.start;
+        this.citiesToVisit = new ArrayList<>(previousWay.getCitiesToVisit());
+        this.citiesToVisit.remove(nextNode);
+        this.citiesVisited = new ArrayList<>(previousWay.citiesVisited);
+        this.distance = previousWay.getDistance() + this.citiesVisited.get(citiesVisited.size()-1).distance(nextNode);
+        this.citiesVisited.add(nextNode);
         this.estimatedDistance = this.distance ;
-        City shortest = new City(100,100);
-        for (City city : this.citiesToVisit){
-            if (nextCity.distance(city) < nextCity.distance(shortest)){
-                shortest = city;
+        City shortest = new City(9999,9999);
+        for (City p : this.citiesToVisit){
+            if (nextNode.distance(p) < nextNode.distance(shortest)){
+                shortest = p;
             }
         }
         if (this.citiesToVisit.size()>1){
-            this.estimatedDistance = this.distance + nextCity.distance(shortest) + nextCity.distance(start);
+            this.estimatedDistance = this.distance + nextNode.distance(shortest) + nextNode.distance(start);
         }
         else {
-            this.estimatedDistance = this.distance + nextCity.distance(start);
+            this.estimatedDistance = this.distance + nextNode.distance(start);
+
         }
     }
 
-    public Voyager(Voyager previous, City nextNode){
-        this.citiesToVisit = new ArrayList<>(previous.getCitiesToVisit());
+    public Voyager(List<City> locationsToVisit , City startingPoint) {
+        this.citiesVisited = new ArrayList<>();
+        this.citiesToVisit = new ArrayList<>();
+        this.distance = 0;
+        this.citiesToVisit = locationsToVisit;
+        this.citiesVisited.add(startingPoint);
+        this.citiesToVisit.remove(startingPoint);
+    }
+
+    public Voyager(Voyager previousWay, City nextNode){
+        this.citiesToVisit = new ArrayList<>(previousWay.getCitiesToVisit());
         this.citiesToVisit.remove(nextNode);
-        this.citiesVisited = new ArrayList<>(previous.getCitiesVisited());
-        this.distance = previous.getDistance() + this.citiesVisited.get(citiesVisited.size()-1).distance(nextNode);
+        this.citiesVisited = new ArrayList<>(previousWay.citiesVisited);
+        this.distance = previousWay.getDistance() + this.citiesVisited.get(citiesVisited.size()-1).distance(nextNode);
         this.citiesVisited.add(nextNode);
         this.estimatedDistance = this.distance ;
     }
 
-    public Voyager(Voyager different) {
-        this.citiesToVisit = new ArrayList<City>(different.getCitiesToVisit());
-        this.citiesVisited = new ArrayList<City>(different.getCitiesVisited());
-        this.distance = different.getDistance();
+    public Voyager(Voyager previousWay) {
+        this.citiesToVisit = new ArrayList<>(previousWay.getCitiesToVisit());
+        this.citiesVisited = new ArrayList<>(previousWay.getCitiesVisited());
+        this.distance = previousWay.getDistance();
     }
+
+
 
     public void addCityToVisit(City city){
         City temp = getCitiesToVisit().get(getCitiesToVisit().size() - 1);
@@ -131,11 +138,12 @@ public class Voyager {
                 Voyager temp = new Voyager(this,city);
                 currentWays.add(temp);
             }
-            for (Voyager w : currentWays){
-                w.depthFirstSearch(completedWays);
+            for (Voyager voyager : currentWays){
+                voyager.depthFirstSearch(completedWays);
             }
             return completedWays;
         }
+
     }
     public List<Voyager> aStar(){
         ArrayList<Voyager> children = new ArrayList<>();
