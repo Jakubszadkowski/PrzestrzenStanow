@@ -3,7 +3,7 @@ package voyager;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Voyager {
+public class Voyager implements Comparable<Voyager> {
     private List<City> citiesToVisit ;
     private List<City> citiesVisited ;
     private City start;
@@ -11,83 +11,76 @@ public class Voyager {
     private double estimatedDistance;
     private boolean aStar;
 
-    public Voyager(List<City> locationsToVisit , City startingPoint, boolean isAStar) {
-        this.start = startingPoint;
+    public Voyager(List<City> citiesToVisit , City start, boolean isAStar) {
+        this.start = start;
         this.citiesVisited = new ArrayList<>();
         this.citiesToVisit = new ArrayList<>();
         this.distance = 0;
-        this.citiesToVisit = locationsToVisit;
-        this.citiesVisited.add(startingPoint);
-        this.citiesToVisit.remove(startingPoint);
+        this.citiesToVisit = citiesToVisit;
+        this.citiesVisited.add(this.start);
+        this.citiesToVisit.remove(this.start);
         this.aStar = true;
-        City shortest = new City(9999,9999);
-        for (City p : this.citiesToVisit){
-            if (startingPoint.distance(p) < startingPoint.distance(shortest)){
-                shortest = p;
-            }
-        }
-        if (locationsToVisit.size()>1){
-            this.estimatedDistance = this.distance + startingPoint.distance(shortest) + startingPoint.distance(start);
-        }
-        else {
-            this.estimatedDistance = this.distance + startingPoint.distance(shortest);
-        }
-    }
-
-    public Voyager(Voyager previousWay, City nextNode, boolean isAStar){
-        this.start = previousWay.start;
-        this.citiesToVisit = new ArrayList<>(previousWay.getCitiesToVisit());
-        this.citiesToVisit.remove(nextNode);
-        this.citiesVisited = new ArrayList<>(previousWay.citiesVisited);
-        this.distance = previousWay.getDistance() + this.citiesVisited.get(citiesVisited.size()-1).distance(nextNode);
-        this.citiesVisited.add(nextNode);
-        this.estimatedDistance = this.distance ;
-        City shortest = new City(9999,9999);
-        for (City p : this.citiesToVisit){
-            if (nextNode.distance(p) < nextNode.distance(shortest)){
-                shortest = p;
+        City shortest = new City(99,99);
+        for (int i = 0 ; i < this.citiesToVisit.size();i++){
+            if (this.start.distance(this.citiesToVisit.get(i)) < this.start.distance(shortest)){
+                shortest = this.citiesToVisit.get(i);
             }
         }
         if (this.citiesToVisit.size()>1){
-            this.estimatedDistance = this.distance + nextNode.distance(shortest) + nextNode.distance(start);
+            this.estimatedDistance = this.distance + this.start.distance(shortest) + this.start.distance(start);
         }
         else {
-            this.estimatedDistance = this.distance + nextNode.distance(start);
+            this.estimatedDistance = this.distance + this.start.distance(shortest);
+        }
+    }
+
+    public Voyager(Voyager previousWay, City nextCity, boolean isAStar){
+        this.start = previousWay.start;
+        this.citiesToVisit = new ArrayList<>(previousWay.getCitiesToVisit());
+        this.citiesToVisit.remove(nextCity);
+        this.citiesVisited = new ArrayList<>(previousWay.citiesVisited);
+        this.distance = previousWay.getDistance() + this.citiesVisited.get(citiesVisited.size()-1).distance(nextCity);
+        this.citiesVisited.add(nextCity);
+        this.estimatedDistance = this.distance ;
+        City shortest = new City(99,99);
+        for (int i = 0 ; i < this.citiesToVisit.size();i++){
+            if (nextCity.distance(this.citiesToVisit.get(i)) < nextCity.distance(shortest)){
+                shortest = this.citiesToVisit.get(i);
+            }
+        }
+        if (this.citiesToVisit.size()>1){
+            this.estimatedDistance = this.distance + nextCity.distance(shortest) + nextCity.distance(start);
+        }
+        else {
+            this.estimatedDistance = this.distance + nextCity.distance(start);
 
         }
     }
 
-    public Voyager(List<City> locationsToVisit , City startingPoint) {
+    public Voyager(List<City> locationsToVisit , City start) {
         this.citiesVisited = new ArrayList<>();
         this.citiesToVisit = new ArrayList<>();
         this.distance = 0;
         this.citiesToVisit = locationsToVisit;
-        this.citiesVisited.add(startingPoint);
-        this.citiesToVisit.remove(startingPoint);
+        this.citiesVisited.add(start);
+        this.citiesToVisit.remove(start);
     }
 
-    public Voyager(Voyager previousWay, City nextNode){
-        this.citiesToVisit = new ArrayList<>(previousWay.getCitiesToVisit());
-        this.citiesToVisit.remove(nextNode);
-        this.citiesVisited = new ArrayList<>(previousWay.citiesVisited);
-        this.distance = previousWay.getDistance() + this.citiesVisited.get(citiesVisited.size()-1).distance(nextNode);
-        this.citiesVisited.add(nextNode);
+    public Voyager(Voyager previousVoyager, City nextCity){
+        this.citiesToVisit = new ArrayList<>(previousVoyager.getCitiesToVisit());
+        this.citiesToVisit.remove(nextCity);
+        this.citiesVisited = new ArrayList<>(previousVoyager.citiesVisited);
+        this.distance = previousVoyager.getDistance() + this.citiesVisited.get(citiesVisited.size()-1).distance(nextCity);
+        this.citiesVisited.add(nextCity);
         this.estimatedDistance = this.distance ;
     }
 
-    public Voyager(Voyager previousWay) {
-        this.citiesToVisit = new ArrayList<>(previousWay.getCitiesToVisit());
-        this.citiesVisited = new ArrayList<>(previousWay.getCitiesVisited());
-        this.distance = previousWay.getDistance();
+    public Voyager(Voyager previousVoyager) {
+        this.citiesToVisit = new ArrayList<>(previousVoyager.getCitiesToVisit());
+        this.citiesVisited = new ArrayList<>(previousVoyager.getCitiesVisited());
+        this.distance = previousVoyager.getDistance();
     }
 
-
-
-    public void addCityToVisit(City city){
-        City temp = getCitiesToVisit().get(getCitiesToVisit().size() - 1);
-        this.distance += temp.distance(city);
-        this.citiesToVisit.add(city);
-    }
 
     public City getStart(){
         return this.start;
@@ -99,7 +92,8 @@ public class Voyager {
         return this.citiesVisited;
     }
     public double getDistance(){
-        return this.distance;}
+        return this.distance;
+    }
 
     public double getEstimatedDistance() {
         return this.estimatedDistance;
@@ -107,8 +101,8 @@ public class Voyager {
     public int compareTo(Voyager voyager) {
         return Double.compare(this.getDistance(), voyager.getDistance());
     }
-    public int compareToHeuristic(Voyager voyager) {
-        return Double.compare(getEstimatedDistance(), voyager.getEstimatedDistance());
+    public int Heuristic(Voyager voyager) {
+        return Double.compare(this.getEstimatedDistance(), voyager.getEstimatedDistance());
     }
     public City lastCityVisited(){
         return getCitiesVisited().get(getCitiesVisited().size()-1);
@@ -122,9 +116,9 @@ public class Voyager {
     }
     public List<Voyager> breadthFirstSearch(Voyager voyager){
         List<Voyager> childVoyager = new ArrayList<>();
-        for (City point : voyager.getCitiesToVisit()) {
-            Voyager w = new Voyager(this, point);
-            childVoyager.add(w);
+        for (int i = 0 ; i < voyager.getCitiesToVisit().size();i++) {
+            Voyager v = new Voyager(this, voyager.getCitiesToVisit().get(i));
+            childVoyager.add(v);
         }
         return childVoyager;
     }
@@ -147,8 +141,8 @@ public class Voyager {
     }
     public List<Voyager> aStar(){
         ArrayList<Voyager> children = new ArrayList<>();
-        for (City city : this.citiesToVisit){
-            children.add( new Voyager(this, city, true));
+        for (City p : this.citiesToVisit){
+            children.add( new Voyager(this, p, true));
         }
         return children;
     }
